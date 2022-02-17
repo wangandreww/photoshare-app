@@ -3,10 +3,11 @@ USE photoshare;
 DROP TABLE IF EXISTS Pictures CASCADE;
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS Friends CASCADE;
-DROP TABLE IF EXISTS PictureTags CASCADE;
+DROP TABLE IF EXISTS Tag CASCADE;
+DROP TABLE IF EXISTS CreatePictureTag CASCADE;
 DROP TABLE IF EXISTS Album CASCADE;
-DROP TABLE IF EXISTS AlbumTags CASCADE;
 DROP TABLE IF EXISTS Comments CASCADE;
+DROP TABLE IF EXISTS Likes CASCADE; 
 
 CREATE TABLE Users (
     user_id int4 AUTO_INCREMENT,
@@ -43,11 +44,20 @@ CREATE TABLE Pictures
 INSERT INTO Users (email, password) VALUES ('test@bu.edu', 'test');
 INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
 
-CREATE TABLE PictureTags
+CREATE TABLE Tag
 (
-  picture_id,
   tag_description VARCHAR(255),
+  tag_counter int4, 
+  CONSTRAINT tag_descPK PRIMARY KEY tag_description
+);
+
+CREATE TABLE CreatePictureTag 
+(
+  tag_description,
+  picture_id,
+  PRIMARY KEY (tag_description, picture_id)
   FOREIGN KEY picture_id REFERENCES Pictures(picture_id)
+  FOREIGN KEY tag_description REFERENCES Tag(tag_description) 
 );
 
 CREATE TABLE Album
@@ -59,16 +69,20 @@ CREATE TABLE Album
   CONSTRAINT album_pk PRIMARY KEY (album_id) 
 );
 
-CREATE TABLE AlbumTags(
-  album_id,
-  tag_description VARCHAR(255),
-  FOREIGN KEY album_id REFERENCES Album(album_id)
-);
-
 CREATE TABLE Comments(
   comment_id,
   comment_description VARCHAR(255),
   comment_timestamp TIME,
   user_id VARCHAR(255),
+  picture_id,
   CONSTRAINT comment_pk PRIMARY KEY (comment_id)
+  FOREIGN KEY picture_id REFERENCES Pictures(picture_id) 
 );
+
+CREATE TABLE Likes(
+  like_counter int4,
+  picture_id,
+  user_id,
+  FOREIGN KEY picture_id REFERENCES Pictures(picture_id)
+  FOREIGN KEY user_id REFERENCES Users(user_id)
+) 
