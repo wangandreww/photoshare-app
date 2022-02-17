@@ -7,8 +7,21 @@ CREATE TABLE Users (
     user_id int4  AUTO_INCREMENT,
     email varchar(255) UNIQUE,
     password varchar(255),
+    first_name varchar(255),
+    last_name varchar(255),
+    DOB DATE
+    gender varchar(255)
+    hometown varchar(255)
   CONSTRAINT users_pk PRIMARY KEY (user_id)
 );
+
+CREATE TABLE Friends (
+    pair_id int4  AUTO_INCREMENT,
+    user_id 
+    friend_id
+);
+
+
 
 CREATE TABLE Pictures
 (
@@ -21,3 +34,4 @@ CREATE TABLE Pictures
 );
 INSERT INTO Users (email, password) VALUES ('test@bu.edu', 'test');
 INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
+
