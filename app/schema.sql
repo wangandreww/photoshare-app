@@ -16,9 +16,11 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Friends (
-    pair_id int4  AUTO_INCREMENT,
-    user_id 
-    friend_id
+    user_id1 int4
+    user_id2 int4 
+    PRIMARY KEY (user_id1, user_id2),
+    FOREIGN KEY (user_id1) REFERENCES Users(user_id),
+    FOREIGN KEY (user_id2) REFERENCES Users(user_id)
 );
 
 
