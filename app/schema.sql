@@ -10,33 +10,33 @@ DROP TABLE IF EXISTS Comments CASCADE;
 DROP TABLE IF EXISTS Likes CASCADE; 
 
 CREATE TABLE Users (
-    user_id int4 AUTO_INCREMENT,
-    email varchar(255) UNIQUE,
-    user_password varchar(255),
-    first_name varchar(255),
-    last_name varchar(255),
-    DOB DATE
-    gender varchar(255)
-    hometown varchar(255)
+  user_id int4 AUTO_INCREMENT,
+  email varchar(255) UNIQUE,
+  user_password varchar(255),
+  first_name varchar(255),
+  last_name varchar(255),
+  DOB DATE
+  gender varchar(255)
+  hometown varchar(255)
   CONSTRAINT users_pk PRIMARY KEY (user_id)
 );
 
 CREATE TABLE Friends (
-    pair_id int4 AUTO_INCREMENT,
-    user_id 
-    friend_id
-    user_id1 int4
-    user_id2 int4 
-    PRIMARY KEY (user_id1, user_id2),
-    FOREIGN KEY (user_id1) REFERENCES Users(user_id),
-    FOREIGN KEY (user_id2) REFERENCES Users(user_id)
+  pair_id int4 AUTO_INCREMENT,
+  user_id int4,
+  friend_id int4,
+  user_id1 int4,
+  user_id2 int4, 
+  FOREIGN KEY (user_id1) REFERENCES Users(user_id),
+  FOREIGN KEY (user_id2) REFERENCES Users(user_id),
+  PRIMARY KEY (user_id1, user_id2)
 );
 
-CREATE TABLE Pictures
+CREATE TABLE Pictures 
 (
   picture_id int4 AUTO_INCREMENT,
   user_id int4,
-  imgdata longblob ,
+  imgdata longblob,
   caption VARCHAR(255),
   INDEX upid_idx (user_id),
   CONSTRAINT pictures_pk PRIMARY KEY (picture_id)
@@ -48,41 +48,41 @@ CREATE TABLE Tag
 (
   tag_description VARCHAR(255),
   tag_counter int4, 
-  CONSTRAINT tag_descPK PRIMARY KEY tag_description
+  CONSTRAINT tag_descPK PRIMARY KEY (tag_description)
 );
 
 CREATE TABLE CreatePictureTag 
 (
-  tag_description,
-  picture_id,
-  PRIMARY KEY (tag_description, picture_id)
-  FOREIGN KEY picture_id REFERENCES Pictures(picture_id)
-  FOREIGN KEY tag_description REFERENCES Tag(tag_description) 
+  tag_description VARCHAR(255),
+  picture_id int4,
+  FOREIGN KEY picture_id REFERENCES Pictures(picture_id),
+  FOREIGN KEY tag_description REFERENCES Tag(tag_description),
+  PRIMARY KEY (tag_description, picture_id) 
 );
 
 CREATE TABLE Album
 (
   album_id int4 AUTO_INCREMENT,
   album_name VARCHAR(255),
-  user_id VARCHAR(255),
-  create_date VARCHAR(255),
+  user_id int4,
+  create_date DATE,
   CONSTRAINT album_pk PRIMARY KEY (album_id) 
 );
 
 CREATE TABLE Comments(
-  comment_id,
+  comment_id int4,
   comment_description VARCHAR(255),
   comment_timestamp TIME,
-  user_id VARCHAR(255),
-  picture_id,
+  user_id int4,
+  picture_id int4, 
   CONSTRAINT comment_pk PRIMARY KEY (comment_id)
   FOREIGN KEY picture_id REFERENCES Pictures(picture_id) 
 );
 
 CREATE TABLE Likes(
   like_counter int4,
-  picture_id,
-  user_id,
+  picture_id int4,
+  user_id int4,
   FOREIGN KEY picture_id REFERENCES Pictures(picture_id)
   FOREIGN KEY user_id REFERENCES Users(user_id)
 ) 
