@@ -63,7 +63,7 @@ def request_loader(request):
 	user = User()
 	user.id = email
 	cursor = mysql.connect().cursor()
-	cursor.execute("SELECT password FROM Users WHERE email = '{0}'".format(email))
+	cursor.execute("SELECT user_password FROM Users WHERE email = '{0}'".format(email))
 	data = cursor.fetchall()
 	pwd = str(data[0][0] )
 	user.is_authenticated = request.form['password'] == pwd
@@ -91,7 +91,7 @@ def login():
 	email = flask.request.form['email']
 	cursor = conn.cursor()
 	#check if email is registered
-	if cursor.execute("SELECT password FROM Users WHERE email = '{0}'".format(email)):
+	if cursor.execute("SELECT user_password FROM Users WHERE email = '{0}'".format(email)):
 		data = cursor.fetchall()
 		pwd = str(data[0][0] )
 		if flask.request.form['password'] == pwd:
