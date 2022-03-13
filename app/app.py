@@ -23,7 +23,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'cs460'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -123,13 +123,18 @@ def register_user():
 	try:
 		email=request.form.get('email')
 		password=request.form.get('password')
+		first = request.form.get('firstname')
+		last = request.form.get('lastname')
+		dob = request.form.get('DOB')
+		gender = request.form.get('gender')
+		hometown = request.form.get('hometown')
 	except:
 		print("couldn't find all tokens") #this prints to shell, end users will not see this (all print statements go to shell)
 		return flask.redirect(flask.url_for('register'))
 	cursor = conn.cursor()
 	test =  isEmailUnique(email)
 	if test:
-		print(cursor.execute("INSERT INTO Users (email, password) VALUES ('{0}', '{1}')".format(email, password)))
+		print(cursor.execute("INSERT INTO Users (email, user_password,first_name,last_name,DOB,gender,hometown) VALUES ('{0}', '{1}','{2}','{3}','{4}','{5}','{6}' )".format(email, password,first,last,dob,gender,hometown)))
 		conn.commit()
 		#log user in
 		user = User()
