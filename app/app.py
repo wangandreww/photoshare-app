@@ -9,6 +9,7 @@
 # see links for further understanding
 ###################################################
 
+from django.forms import NullBooleanField
 import flask
 from flask import Flask, Response, request, render_template, redirect, url_for
 from flaskext.mysql import MySQL
@@ -123,9 +124,12 @@ def register_user():
 	try:
 		email=request.form.get('email')
 		password=request.form.get('password')
+		print(password)
 		first = request.form.get('firstname')
 		last = request.form.get('lastname')
 		dob = request.form.get('DOB')
+		if (dob == ''):
+			dob = '1000-01-01'
 		gender = request.form.get('gender')
 		hometown = request.form.get('hometown')
 	except:
