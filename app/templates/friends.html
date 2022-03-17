@@ -1,0 +1,20 @@
+<!doctype html>
+<head>
+    <title>Add a friend!</title>
+</head>
+{% if message %}
+<h4>{{message}}!</h4>
+{% endif %}
+    <body>
+        <div class="title">
+            <h1>Enter which friend you want to add below</h1>
+        </div>
+        <div id="content">
+            <form method="POST" action="{{ url_for('add_friend') }}">
+                <label for="email">Enter friend's email:</label>
+                <input type="email" name="email" /><br />
+                <input type="submit" />
+            </form>
+         </div>
+    </body>
+<a href='/'>Home</a>

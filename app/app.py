@@ -159,6 +159,9 @@ def getUserIdFromEmail(email):
 	cursor.execute("SELECT user_id  FROM Users WHERE email = '{0}'".format(email))
 	return cursor.fetchone()[0]
 
+def getUserFriends(uid):
+	return 1
+
 def isEmailUnique(email):
 	#use this to check if a email has already been registered
 	cursor = conn.cursor()
@@ -197,6 +200,38 @@ def upload_file():
 		return render_template('upload.html')
 #end photo uploading code
 
+@app.route('/friends', methods=['GET', 'POST'])
+@flask_login.login_required
+def add_friend():
+	
+	if request.method == 'POST':
+		try:
+			email=request.form.get('email')
+			print(email)
+		except:
+			print("couldn't find all tokens") #this prints to shell, end users will not see this (all print statements go to shell)
+			return flask.redirect(flask.url_for('friends'))
+
+		if ((email,) in getUserList()):
+			curr_id = getUserIdFromEmail(flask_login.current_user.id)
+			friend_id = getUserIdFromEmail(email)
+			if (curr_id != friend_id):
+				cursor = conn.cursor()
+				print(cursor.execute("INSERT INTO Friends (user_id1, user_id2) VALUES ('{0}', '{1}')".format(curr_id, friend_id)))
+				conn.commit()
+				return render_template('friends.html', message='Friend Added!')
+			else:
+				print("couldn't find all tokens")
+				return flask.redirect(flask.url_for('add'))
+		else:
+			return render_template('friends.html', message='Friend does not exist')
+	#The method is GET so we return a  HTML form to upload the a photo.	
+	else:
+		# cursor = conn.cursor()
+		# cursor.execute("SELECT first_name, last_name, email FROM Users")
+		# data = cursor.fetchall()
+		# print(data)
+		return render_template('friends.html')
 
 #default page
 @app.route("/", methods=['GET'])
@@ -208,3 +243,9 @@ if __name__ == "__main__":
 	#this is invoked when in the shell  you run
 	#$ python app.py
 	app.run(port=5000, debug=True)
+
+
+
+#THINGS SKIPPED FOR NOW 
+
+#user activity
