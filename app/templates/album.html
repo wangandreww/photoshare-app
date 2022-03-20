@@ -1,0 +1,20 @@
+<!doctype html>
+<head>
+    <title>Create An Album!</title>
+</head>
+{% if message %}
+<h4>{{message}}!</h4>
+{% endif %}
+    <body>
+        <div class="title">
+            <h1>Create An Album!</h1>
+        </div>
+        <div id="content">
+            <form method="POST" action="{{ url_for('create_album') }}">
+                <label for="album">Enter Album Name:</label>
+                <input type="album" name="album" /><br />
+                <input type="submit" />
+            </form>
+         </div>
+    </body>
+<a href='/'>Home</a>

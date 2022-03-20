@@ -8,7 +8,7 @@
 # and Flask Offical Tutorial at  http://flask.pocoo.org/docs/0.10/patterns/fileuploads/
 # see links for further understanding
 ###################################################
-
+from datetime import date
 from django.forms import NullBooleanField
 import flask
 from flask import Flask, Response, request, render_template, redirect, url_for
@@ -191,14 +191,23 @@ def upload_file():
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
 		photo_data =imgfile.read()
+		album_id = getAlbumID(request.form.get('album'),uid)
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) VALUES (%s, %s, %s )''', (photo_data, uid, caption))
+		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption, album_id) VALUES (%s, %s, %s, %s )''', (photo_data, uid, caption,album_id))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid), base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
 	else:
 		return render_template('upload.html')
 #end photo uploading code
+
+def getAlbumID(albumname,uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT album_id FROM Album WHERE album_name = '{0}' AND user_id = '{1}'".format(albumname, uid))
+	result = cursor.fetchall()
+	return result
+
+
 
 @app.route('/friends', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -233,6 +242,36 @@ def add_friend():
 		# print(data)
 		return render_template('friends.html')
 
+@app.route('/album', methods=['GET', 'POST'])
+@flask_login.login_required
+def create_album():
+	
+	if request.method == 'POST':
+		try:
+			album=request.form.get('album')
+			
+
+		except:
+			print("couldn't find all tokens") #this prints to shell, end users will not see this (all print statements go to shell)
+			return flask.redirect(flask.url_for('friends'))
+
+		current_date = date.today()
+		curr_id = getUserIdFromEmail(flask_login.current_user.id)
+		cursor = conn.cursor()
+		cursor.execute("INSERT INTO Album (album_name,user_id,create_date) VALUES ('{0}', '{1}','{2}')".format(album,curr_id, current_date))
+		conn.commit()
+
+		
+		return render_template('album.html', message='Album Created!')
+
+	#The method is GET so we return a  HTML form to upload the a photo.	
+	else:
+		# cursor = conn.cursor()
+		# cursor.execute("SELECT first_name, last_name, email FROM Users")
+		# data = cursor.fetchall()
+		# print(data)
+		return render_template('album.html')
+
 @app.route('/search', methods=['GET', 'POST'])
 def searchFriends():
 	if request.method == 'POST':
@@ -261,7 +300,9 @@ def searchFriends():
 #default page
 @app.route("/", methods=['GET'])
 def hello():
+	print(getAlbumID("Memories",1))
 	return render_template('hello.html', message='Welecome to Photoshare')
+
 
 
 if __name__ == "__main__":

@@ -36,7 +36,9 @@ CREATE TABLE Pictures
   user_id int4,
   imgdata longblob ,
   caption VARCHAR(255),
+  album_id int4 ON DELETE CASCADE
   INDEX upid_idx (user_id),
+  FOREIGN KEY (album_id) REFERENCES Album(album_id) ON DELETE CASCADE,
   CONSTRAINT pictures_pk PRIMARY KEY (picture_id)
 );
 
