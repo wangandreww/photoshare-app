@@ -175,7 +175,16 @@ def isEmailUnique(email):
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-	return render_template('hello.html', name=flask_login.current_user.id, message="Here's your profile")
+	uid = getUserIdFromEmail(flask_login.current_user.id)
+	photo_list = getUserPhotos(uid)
+	album_list = getUserAlbums(uid)
+	return render_template('profile.html',photos = photo_list, albums = album_list, base64=base64)
+
+def getUserAlbums(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT album_name,album_id FROM Album WHERE user_id ='{0}'".format(uid))
+	return cursor.fetchall()
+
 
 #begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML
@@ -347,7 +356,6 @@ def searchFriends():
 def browse():
 	photo_list = getPhotos()
 	album_list = getAlbums()
-	
 	print(album_list)
 	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list)
 
@@ -372,6 +380,14 @@ def getPhotos():
 	cursor = conn.cursor()
 	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures")
 	return cursor.fetchall()
+
+	
+
+def getUserPhotos(id):
+	cursor = conn.cursor()
+	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id= '{0}'".format(id))
+	return cursor.fetchall()
+
 
 
 #default page

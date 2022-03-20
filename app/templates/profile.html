@@ -1,0 +1,27 @@
+<h1>Here is Your Profile!</h1>
+
+{% if photos %}
+    <ul>
+    {% for photo in photos %}
+
+        <li>{{photo[2]}}<br>
+        <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
+        <a href="/deletePicture">Delete this Picture</a>
+        
+        
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if albums %}
+<h2>Here are your albums</h2>
+    <ul>
+    {% for album in albums %}
+
+        <li><a href='/browse/{{album[1]}}'>{{album[0]}}</a></li>
+        <a href="/deleteAlbum">Delete this Picture</a>
+        
+    {% endfor %}
+    </ul>
+{% endif %}

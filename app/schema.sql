@@ -30,33 +30,6 @@ CREATE TABLE Friends (
     PRIMARY KEY (user_id1, user_id2)
 );
 
-CREATE TABLE Pictures
-(
-  picture_id int4 AUTO_INCREMENT,
-  user_id int4,
-  imgdata longblob ,
-  caption VARCHAR(255),
-  album_id int4 ON DELETE CASCADE
-  INDEX upid_idx (user_id),
-  FOREIGN KEY (album_id) REFERENCES Album(album_id) ON DELETE CASCADE,
-  CONSTRAINT pictures_pk PRIMARY KEY (picture_id)
-);
-
-CREATE TABLE Tag
-(
-  tag_description VARCHAR(255),
-  tag_counter int4, 
-  CONSTRAINT tag_descPK PRIMARY KEY (tag_description)
-);
-
-CREATE TABLE CreatePictureTag 
-(
-  tag_description VARCHAR(255),
-  picture_id int4,
-  PRIMARY KEY (tag_description, picture_id),
-  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id),
-  FOREIGN KEY (tag_description) REFERENCES Tag(tag_description) 
-);
 
 CREATE TABLE Album
 (
@@ -65,6 +38,18 @@ CREATE TABLE Album
   user_id VARCHAR(255),
   create_date VARCHAR(255),
   CONSTRAINT album_pk PRIMARY KEY (album_id) 
+);
+
+CREATE TABLE Pictures
+(
+  picture_id int4 AUTO_INCREMENT,
+  user_id int4,
+  imgdata longblob ,
+  caption VARCHAR(255),
+  album_id int4,
+  INDEX upid_idx (user_id),
+  FOREIGN KEY (album_id) REFERENCES Album(album_id) ON DELETE CASCADE,
+  CONSTRAINT pictures_pk PRIMARY KEY (picture_id)
 );
 
 CREATE TABLE Comments(
@@ -84,3 +69,19 @@ CREATE TABLE Likes(
   FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id),
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 ) 
+
+CREATE TABLE Tag
+(
+  tag_description VARCHAR(255),
+  tag_counter int4, 
+  CONSTRAINT tag_descPK PRIMARY KEY (tag_description)
+);
+
+CREATE TABLE CreatePictureTag 
+(
+  tag_description VARCHAR(255),
+  picture_id int4,
+  PRIMARY KEY (tag_description, picture_id),
+  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id),
+  FOREIGN KEY (tag_description) REFERENCES Tag(tag_description) 
+);
