@@ -1,0 +1,22 @@
+<form action="{{url_for('searchFriends', name = firstname)}}" method="post">
+    <h1> Search for friends with their name! </h1>
+      <label for="firstname">Enter First name:</label>
+      <input type="search" name="firstname" /><br />
+      <label for="lastname">Enter Last name:</label>
+      <input type="search" name="lastname" /><br />
+      <input type="submit"/>
+</form>
+
+
+ {% if message %}
+ <h4>{{message}}</h4>
+{% endif %}
+
+{% if result %}
+   <ul>
+     {% for user in result %}
+       <li> User Email:{{user[0]}} <br /> First Name:{{user[1]}} <br /> Last Name:{{user[2]}} <br /> Hometown: {{user[3]}} <br />User gender is:{{user[4]}} <br /></li>
+     {% endfor %}
+   </ul>
+   <a href="{{url_for('add_friend')}}">Add Friend</a><br />
+{% endif %}

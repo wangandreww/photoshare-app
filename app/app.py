@@ -233,6 +233,31 @@ def add_friend():
 		# print(data)
 		return render_template('friends.html')
 
+@app.route('/search', methods=['GET', 'POST'])
+def searchFriends():
+	if request.method == 'POST':
+		try:
+			first_name = request.form.get('firstname')
+			last_name = request.form.get('lastname')
+		except:
+			print("couldn't find all tokens") #this prints to shell, end users will not see this (all print statements go to shell)
+			return flask.redirect(flask.url_for('friends'))
+
+		cursor = conn.cursor()
+		print(first_name)
+		print(last_name)
+		cursor.execute("SELECT email, first_name, last_name, hometown, gender FROM Users WHERE first_name = '{0}' AND last_name = '{1}'".format(first_name, last_name))
+		results = cursor.fetchall()
+		print (results)
+		return render_template('search.html', name=flask_login.current_user.id, message='Search Result', result=results)
+	#The method is GET so we return a  HTML form to upload the a photo.	
+	else:
+		# cursor = conn.cursor()
+		# cursor.execute("SELECT first_name, last_name, email FROM Users")
+		# data = cursor.fetchall()
+		# print(data)
+		return render_template('search.html')
+
 #default page
 @app.route("/", methods=['GET'])
 def hello():
