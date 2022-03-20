@@ -197,7 +197,8 @@ def upload_file():
 		if (album_id == ()):
 			return render_template('hello.html', message='The Album you have selected is not valid')
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption, album_id) VALUES (%s, %s, %s, %s )''', (photo_data, uid, caption,album_id))
+		print(album_id)
+		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption, album_id) VALUES (%s, %s, %s, %s )''', (photo_data, int(uid), caption,int(album_id)))
 		conn.commit()
 		
 		pid = getPhotoId(caption, photo_data, album_id)
@@ -221,19 +222,19 @@ def tagCheck(tag):
 	cursor.execute("SELECT tag_description FROM Tag WHERE tag_description = '{0}'".format(tag))
 	res = cursor.fetchall()
 	if res == ():
-		return True
+		return True 
 	else:
 		return False 
 
 def getPhotoId(caption, data, albums_id):
 	cursor = conn.cursor()
-	cursor.execute("""SELECT photo_id FROM Pictures WHERE caption = %s AND imgdata = %s AND album_id = %s""", (caption, data, int(albums_id)))
+	cursor.execute("""SELECT picture_id FROM Pictures WHERE caption = %s AND imgdata = %s AND album_id = %s""", (caption, data, int(albums_id)))
 	return cursor.fetchone()[0]
 
 def getAlbumID(albumname,uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT album_id FROM Album WHERE album_name = '{0}' AND user_id = '{1}'".format(albumname, uid))
-	result = cursor.fetchall()
+	result = cursor.fetchone()[0]
 	return result
 
 
