@@ -327,6 +327,37 @@ def searchFriends():
 		# print(data)
 		return render_template('search.html')
 
+@app.route('/browse', methods=['GET'])
+def browse():
+	photo_list = getPhotos()
+	album_list = getAlbums()
+	
+	print(album_list)
+	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list)
+
+@app.route('/browse/<album_id>', methods=['GET'])
+def browseAlbum(album_id):
+	photo_list = getAlbumPics(album_id)
+	album_list = getAlbums()
+	
+	return render_template('browse.html', message = "Here are all photos in this Album!",photos=photo_list,base64=base64,albums = album_list)
+ 
+def getAlbumPics(album_id):
+	cursor = conn.cursor()
+	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE album_id = '{0}'".format(album_id))
+	return cursor.fetchall()
+
+def getAlbums():
+	cursor = conn.cursor()
+	cursor.execute("SELECT album_name,album_id FROM Album")
+	return cursor.fetchall()
+
+def getPhotos():
+	cursor = conn.cursor()
+	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures")
+	return cursor.fetchall()
+
+
 #default page
 @app.route("/", methods=['GET'])
 def hello():

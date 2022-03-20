@@ -1,0 +1,26 @@
+{% if message %}
+    <h2>{{message}}</h2>
+{% endif %}
+
+{% if photos %}
+    <ul>
+    {% for photo in photos %}
+
+        <li>{{photo[2]}}<br>
+        <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
+        
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if albums %}
+<h2>Here are all albums</h2>
+    <ul>
+    {% for album in albums %}
+
+        <li><a href='/browse/{{album[1]}}'>{{album[0]}}</a></li>
+        
+    {% endfor %}
+    </ul>
+{% endif %}
+
