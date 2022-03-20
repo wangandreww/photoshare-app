@@ -330,8 +330,8 @@ def searchFriends():
 #default page
 @app.route("/", methods=['GET'])
 def hello():
-	if(getAlbumID("Memories",1) == () ):
-		print(1)
+	# if(getAlbumID("Memories",1) == () ):
+	# 	print(1)
 	
 	return render_template('hello.html', message='Welecome to Photoshare')
 
