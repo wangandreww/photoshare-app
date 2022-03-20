@@ -24,7 +24,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Huyphan007!'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -183,11 +183,11 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@app.route('/upload', methods=['GET', 'POST'])
-@flask_login.login_required
-def upload_file():
-	if request.method == 'POST':
-		tags = request.form.get('tags')
+@app.route('/upload', methods=['GET', 'POST']) 
+@flask_login.login_required 
+def upload_file(): 
+	if request.method == 'POST': 
+		tags = request.form.get('tags') 
 		tag_list = tags.split(' ')
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		imgfile = request.files['photo']
@@ -271,6 +271,22 @@ def add_friend():
 		# data = cursor.fetchall()
 		# print(data)
 		return render_template('friends.html')
+
+@app.route('/comments', methods=['GET', 'POST'])
+@flask_login.login_required
+def add_comment():
+    	
+	if request.method == 'POST': 
+		comment = request.form.get('comment') 
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		date = date.today()
+		album_id = getAlbumID(request.form.get('album'),uid)
+		cursor = conn.cursor()
+		cursor.execute("")
+	
+
+
+		
 
 @app.route('/album', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -371,7 +387,7 @@ def hello():
 if __name__ == "__main__":
 	#this is invoked when in the shell  you run
 	#$ python app.py
-	app.run(port=5000, debug=True)
+	app.run(host='0.0.0.0', debug=True)
 
 
 
