@@ -187,19 +187,48 @@ def allowed_file(filename):
 @flask_login.login_required
 def upload_file():
 	if request.method == 'POST':
+		tags = request.form.get('tags')
+		tag_list = tags.split(' ')
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
 		photo_data =imgfile.read()
 		album_id = getAlbumID(request.form.get('album'),uid)
+		if (album_id == ()):
+			return render_template('hello.html', message='The Album you have selected is not valid')
 		cursor = conn.cursor()
 		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption, album_id) VALUES (%s, %s, %s, %s )''', (photo_data, uid, caption,album_id))
+		conn.commit()
+		
+		pid = getPhotoId(caption, photo_data, album_id)
+		cursor = conn.cursor()
+		for x in range(len(tag_list)):
+			if tagCheck(tag_list[x]):
+				cursor.execute("INSERT INTO Tag (tag_description) VALUES ('{0}')".format(tag_list[x]))
+				cursor.execute("INSERT INTO CreatePictureTag (picture_id, tag_description) VALUES ('{0}', '{1}')".format(pid,tag_list[x]))
+				
+			else: 
+				cursor.execute("INSERT INTO CreatePictureTag (picture_id, tag_description) VALUES ('{0}', '{1}')".format(pid,tag_list[x]))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid), base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
 	else:
 		return render_template('upload.html')
 #end photo uploading code
+
+def tagCheck(tag):
+	cursor = conn.cursor()
+	cursor.execute("SELECT tag_description FROM Tag WHERE tag_description = '{0}'".format(tag))
+	res = cursor.fetchall()
+	if res == ():
+		return True
+	else:
+		return False 
+
+def getPhotoId(caption, data, albums_id):
+	cursor = conn.cursor()
+	cursor.execute("""SELECT photo_id FROM Pictures WHERE caption = %s AND imgdata = %s AND album_id = %s""", (caption, data, int(albums_id)))
+	return cursor.fetchone()[0]
 
 def getAlbumID(albumname,uid):
 	cursor = conn.cursor()
@@ -300,7 +329,9 @@ def searchFriends():
 #default page
 @app.route("/", methods=['GET'])
 def hello():
-	print(getAlbumID("Memories",1))
+	if(getAlbumID("Memories",1) == () ):
+		print(1)
+	
 	return render_template('hello.html', message='Welecome to Photoshare')
 
 
