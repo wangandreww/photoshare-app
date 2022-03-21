@@ -20,6 +20,21 @@
                 <input type="text" name= "comment" /><br />
                 <input type="submit" />
             </form>
+        
+        <form action="{{url_for('add_like', pid=photo[1])}}" method="post" >
+            <label for="like"></label> 
+            <input type="submit" value="like" name="like"/> <br/>
+        </form>
+
+        <a href="/show_likes/{{photo[1]}}"> 
+            <Button>
+                Show Likes
+            </Button>
+        </a>
+
+        {% if show_likes %}
+            {{show_likes}}
+        {% endif %}
 
     {% endfor %}
     </ul>
