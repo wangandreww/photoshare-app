@@ -1,0 +1,15 @@
+{% if photos %}
+<h2>Here are Photos Tagged with {{tag_name}}</h2>
+    <u1>
+        {% for photo in photos %}
+        <li>{{photo[2]}}<br>
+            <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
+             
+              <li><a href = '/viewlikes/{{photo[1]}}'> View Likes </a></li>
+            <li><a href='/viewComments/{{photo[1]}}'>View Comments</a></li>
+             
+
+        {% endfor %}
+    </u1>
+{% endif %}
+<li><a href='/'>Home</a></li>
