@@ -10,6 +10,7 @@
 ###################################################
 from datetime import date
 from django.forms import NullBooleanField
+from django.test import tag
 import flask
 from flask import Flask, Response, request, render_template, redirect, url_for
 from flaskext.mysql import MySQL
@@ -406,6 +407,37 @@ def getPhotos():
 def getUserPhotos(id):
 	cursor = conn.cursor()
 	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id= '{0}'".format(id))
+	return cursor.fetchall()
+
+
+@app.route('/browseByTags', methods=['GET'])
+@flask_login.login_required
+def userTagList():
+	curr_id = getUserIdFromEmail(flask_login.current_user.id)
+	tag_list = getUserTags(curr_id)
+	print(tag_list)
+	return render_template('browseByTags.html',tags = tag_list)
+
+
+@app.route('/userTagPhoto/<tag>', methods=['GET'])
+def userTagPhoto(tag):
+	curr_id = getUserIdFromEmail(flask_login.current_user.id)
+	photo_list = getUserPhotoByTag(tag,curr_id)
+	return render_template('userTagPhoto.html',photos = photo_list,base64=base64,tag_name= tag)
+
+def getUserPhotoByTag(tag,id):
+	cursor = conn.cursor()
+	cursor.execute("SELECT p.imgdata, p.picture_id, p.caption FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND p.user_id= '{0}' AND c.tag_description = '{1}'".format(id,tag))
+	return cursor.fetchall()
+
+def getAllTags():
+	cursor = conn.cursor()
+	cursor.execute("SELECT * FROM Tag")
+	return cursor.fetchall()
+
+def getUserTags(id):
+	cursor = conn.cursor()
+	cursor.execute("SELECT c.tag_description FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND p.user_id= '{0}'".format(id))
 	return cursor.fetchall()
 
 

@@ -1,0 +1,10 @@
+{% if tags %}
+<h2>Browse your photos by Tags</h2>
+    <ul>
+    {% for tag in tags %}
+        <li><a href="/userTagPhoto/{{tag[0]}}">{{tag[0]}}</a> </br> </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<li><a href='/'>Home</a></li>
