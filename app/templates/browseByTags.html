@@ -5,6 +5,21 @@
         <li><a href="/userTagPhoto/{{tag[0]}}">{{tag[0]}}</a> </br> </li>
     {% endfor %}
     </ul>
+    <a href='/allTags'>See All Tags!</a>
+    <br>
 {% endif %}
 
-<li><a href='/'>Home</a></li>
+
+
+{% if alltags %}
+<h2>Browse your photos by Tags</h2>
+    <ul>
+    {% for tag in alltags %}
+        <li><a href="/userTagPhoto/{{tag[0]}}">{{tag[0]}}</a> </br> </li>
+    {% endfor %}
+    </ul>
+    <a href='/browseByTags'>See Your Tags!</a>
+    <br>
+{% endif %}
+
+<a href='/'>Home</a>

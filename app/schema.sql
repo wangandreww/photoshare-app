@@ -81,6 +81,6 @@ CREATE TABLE CreatePictureTag
   tag_description VARCHAR(255),
   picture_id int4,
   PRIMARY KEY (tag_description, picture_id),
-  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id),
+  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id) ON DELETE CASCADE,
   FOREIGN KEY (tag_description) REFERENCES Tag(tag_description) 
 ); 

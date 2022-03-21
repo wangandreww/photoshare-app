@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Huyphan007!'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -438,6 +438,14 @@ def userTagPhoto(tag):
 	photo_list = getUserPhotoByTag(tag,curr_id)
 	return render_template('userTagPhoto.html',photos = photo_list,base64=base64,tag_name= tag)
 
+@app.route('/allTags', methods=['GET'])
+@flask_login.login_required
+def allTags():
+	tag_list = getAllTags()
+	print(tag_list)
+	return render_template('browseByTags.html', alltags = tag_list)
+
+
 def getUserPhotoByTag(tag,id):
 	cursor = conn.cursor()
 	cursor.execute("SELECT p.imgdata, p.picture_id, p.caption FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND p.user_id= '{0}' AND c.tag_description = '{1}'".format(id,tag))
@@ -450,7 +458,7 @@ def getAllTags():
 
 def getUserTags(id):
 	cursor = conn.cursor()
-	cursor.execute("SELECT c.tag_description FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND p.user_id= '{0}'".format(id))
+	cursor.execute("SELECT DISTINCT c.tag_description FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND p.user_id= '{0}'".format(id))
 	return cursor.fetchall()
 
 
