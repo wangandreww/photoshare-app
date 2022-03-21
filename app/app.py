@@ -281,7 +281,7 @@ def add_friend():
 		# print(data)
 		return render_template('friends.html')
 
-@app.route('/comments', methods=['POST']) 
+@app.route('/comments', methods=['POST'])  
 def add_comment():
     	
 	if request.method == 'POST': 
@@ -302,7 +302,7 @@ def add_comment():
 # 	cursor.execute("SELECT comment_description,comment_timestamp,user_id,picture_id FROM Comments WHERE picture_id = '{0}'".format(picture_id))
 # 	commentList = cursor.fetchall()
 # 	print(commentList)
-#     return render_template('viewcomments.html', message = 'Comments for this post', commentList = commentList, photo = getPhotoById(photo_id), base64=base64)
+#     return render_template('viewcomments.html', message = 'Comments for this post', commentList = commentList, photo = getPhotoById(photo_id), base64=base64)git 
 	
 
 @app.route('/album', methods=['GET', 'POST'])
