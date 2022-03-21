@@ -299,7 +299,7 @@ def searchComments():
 		comment = request.form.get('comment')
 		print(comment)
 		cursor = conn.cursor()
-		cursor.execute("SELECT COUNT(*), user_id FROM Comments WHERE comment_description = '{0}' GROUP BY user_id ORDER BY COUNT(*) DESC".format(comment))
+		cursor.execute("SELECT COUNT(*), U.user_id, U.first_name, U.last_name FROM Comments C JOIN Users U WHERE comment_description = '{0}' AND U.user_id = C.user_id GROUP BY user_id ORDER BY COUNT(*) DESC".format(comment))
 		userList = cursor.fetchall()
 		print(userList)
 		return render_template('searchComments.html', userList = userList)
@@ -321,12 +321,45 @@ def add_comment():
 
 		return render_template('hello.html')
 
+@app.route('/add_like', methods=['POST'])
+@flask_login.login_required
+def add_like(): 
+	likes = 0
+	photo_id = request.args.get('pid')
+	user_id = getUserIdFromEmail(flask_login.current_user.id)
+	cursor = conn.cursor()
 
-# @app.route('/likes', methods=['POST'])
-# def add_like(): 
+	# cursor.execute("SELECT user_id FROM Likes")
+	# res1 = cursor.fetchall()
+	# if (res1 == ())
+    		
 
-# @app.route('/showLikes', methods=['GET'])
-# def show_like(): 
+
+
+	cursor.execute("SELECT L.picture_id FROM Likes L JOIN Pictures P WHERE L.picture_id = P.picture_id")
+	res = cursor.fetchall() 
+	if (res == ()):
+		cursor.execute("INSERT INTO Likes(like_counter, picture_id, user_id) VALUES ('{0}', '{1}', '{2}')".format(likes, photo_id, user_id))
+		cursor.execute("UPDATE Likes SET like_counter = like_counter + 1")
+		conn.commit()
+	else:
+		cursor.execute("UPDATE Likes SET like_counter=like_counter + 1")
+		conn.commit()
+	
+	return render_template('browse.html')
+
+@app.route('/show_likes/<pid>', methods=['GET'])
+def show_likes(pid): 
+	cursor = conn.cursor()
+	cursor.execute("SELECT COUNT(DISTINCT user_id) FROM Likes WHERE picture_id = '{0}'".format(pid))
+	result = cursor.fetchone()[0]
+	
+	print(result)
+	photo_list = getPhotos()
+	album_list = getAlbums()
+	print(album_list)
+	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list,show_likes = result)
+	
 
 # @app.route('tags', methods=["POST"])	
 
@@ -436,7 +469,7 @@ def hello():
 if __name__ == "__main__":
 	#this is invoked when in the shell  you run
 	#$ python app.py
-	app.run(host='0.0.0.0', debug=True)
+	app.run(port=5000, debug=True)
 
 
 
