@@ -1,0 +1,18 @@
+<button>
+    <a href="/"> Home </a>
+</button>
+
+<form action="{{url_for('searchComments')}}" method="post">
+    <h1> Search for users with this comment </h1>
+      <label for="comment"> Enter comment </label> 
+      <input type="search" name="comment" /><br />
+      <input type="submit"/> 
+</form>
+
+<body>
+    {% if userList %}
+    {% for user in userList %}
+        <p> {{user[1]}} has made this comment {{user[0]}} times </p>
+    {% endfor %}
+    {% endif %}
+</body>

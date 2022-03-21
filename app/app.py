@@ -24,7 +24,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Huyphan007!'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -284,7 +284,7 @@ def add_friend():
 @app.route('/viewcomments/<photo_id>', methods = ['GET'])
 def viewComments(photo_id):
 	cursor = conn.cursor()
-	cursor.execute("SELECT comment_description,comment_timestamp,user_id,picture_id FROM Comments WHERE picture_id = '{0}'".format(photo_id))
+	cursor.execute("SELECT comment_description,comment_timestamp,user_id,picture_id FROM Comments WHERE picture_id = '{0}'".format(photo_id)) 
 	comment_list = cursor.fetchall()
 	return render_template('viewcomments.html', message = 'Comments for this post', commentList = comment_list, photo = getPhotoById(photo_id), base64=base64)
 
@@ -292,6 +292,19 @@ def getPhotoById(photo_id):
 	cursor = conn.cursor()
 	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE picture_id = '{0}'".format(photo_id))
 	return cursor.fetchall()
+
+@app.route('/searchComments', methods=['POST', 'GET'])
+def searchComments():
+	if flask.request.method == 'POST':
+		comment = request.form.get('comment')
+		print(comment)
+		cursor = conn.cursor()
+		cursor.execute("SELECT COUNT(*), user_id FROM Comments WHERE comment_description = '{0}' GROUP BY user_id ORDER BY COUNT(*) DESC".format(comment))
+		userList = cursor.fetchall()
+		print(userList)
+		return render_template('searchComments.html', userList = userList)
+	else:
+		return render_template('searchComments.html')
 
 @app.route('/comments', methods=['POST'])  
 def add_comment():
@@ -308,14 +321,14 @@ def add_comment():
 
 		return render_template('hello.html')
 
-# @app.route('/viewcomments/<photo_id>', methods=['GET'])
-# def view_comment(photo_id):
-#    cursor = conn.cursor()
-# 	cursor.execute("SELECT comment_description,comment_timestamp,user_id,picture_id FROM Comments WHERE picture_id = '{0}'".format(picture_id))
-# 	commentList = cursor.fetchall()
-# 	print(commentList)
-#     return render_template('viewcomments.html', message = 'Comments for this post', commentList = commentList, photo = getPhotoById(photo_id), base64=base64)git 
-	
+
+# @app.route('/likes', methods=['POST'])
+# def add_like(): 
+
+# @app.route('/showLikes', methods=['GET'])
+# def show_like(): 
+
+# @app.route('tags', methods=["POST"])	
 
 @app.route('/album', methods=['GET', 'POST'])
 @flask_login.login_required
