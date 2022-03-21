@@ -211,7 +211,7 @@ def upload_file():
 		conn.commit()
 		
 		pid = getPhotoId(caption, photo_data, album_id)
-		cursor = conn.cursor()
+		cursor = conn.cursor() 
 		for x in range(len(tag_list)):
 			if tagCheck(tag_list[x]):
 				cursor.execute("INSERT INTO Tag (tag_description) VALUES ('{0}')".format(tag_list[x]))
@@ -281,21 +281,29 @@ def add_friend():
 		# print(data)
 		return render_template('friends.html')
 
-@app.route('/comments', methods=['GET', 'POST'])
-@flask_login.login_required
+@app.route('/comments', methods=['POST']) 
 def add_comment():
     	
 	if request.method == 'POST': 
 		comment = request.form.get('comment') 
+		print(comment)
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		date = date.today()
-		album_id = getAlbumID(request.form.get('album'),uid)
+		current_date = date.today()
+		photo_id = request.args.get('pid')
 		cursor = conn.cursor()
-		cursor.execute("")
+		cursor.execute("INSERT INTO Comments(comment_description, comment_timestamp, user_id, picture_id) VALUES ('{0}', '{1}', '{2}', '{3}')".format(comment, current_date, uid, photo_id))
+		conn.commit()
+
+		return render_template('hello.html')
+
+# @app.route('/viewcomments/<photo_id>', methods=['GET'])
+# def view_comment(photo_id):
+#     cursor = conn.cursor()
+# 	cursor.execute("SELECT comment_description,comment_timestamp,user_id,picture_id FROM Comments WHERE picture_id = '{0}'".format(picture_id))
+# 	commentList = cursor.fetchall()
+# 	print(commentList)
+#     return render_template('viewcomments.html', message = 'Comments for this post', commentList = commentList, photo = getPhotoById(photo_id), base64=base64)
 	
-
-
-		
 
 @app.route('/album', methods=['GET', 'POST'])
 @flask_login.login_required

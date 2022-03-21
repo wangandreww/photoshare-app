@@ -6,9 +6,17 @@
     <ul>
     {% for photo in photos %}
 
-        <li>{{photo[2]}}<br>
+        <li>{{photo[2]}}<br> 
         <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
-        
+        <li><a href='/viewcomments/{{photo[1]}}'>View All of This Photo's Comments</a></li>
+
+        <form action="{{url_for('add_comment', pid=photo[1])}}" method="post">
+            <h1> Leave a comment! </h1>
+                <label for="comment">Enter Comment:</label>
+                <input type="text" name= "comment" /><br />
+                <input type="submit" />
+            </form>
+
     {% endfor %}
     </ul>
 {% endif %}

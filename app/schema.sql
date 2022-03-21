@@ -1,4 +1,3 @@
-
 CREATE DATABASE IF NOT EXISTS photoshare;
 USE photoshare;
 DROP TABLE IF EXISTS Pictures CASCADE;
@@ -55,7 +54,7 @@ CREATE TABLE Pictures
 CREATE TABLE Comments(
   comment_id int4 AUTO_INCREMENT,
   comment_description VARCHAR(255),
-  comment_timestamp TIME,
+  comment_timestamp DATE,
   user_id VARCHAR(255),
   picture_id int4,
   CONSTRAINT comment_pk PRIMARY KEY (comment_id),
@@ -84,4 +83,4 @@ CREATE TABLE CreatePictureTag
   PRIMARY KEY (tag_description, picture_id),
   FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id),
   FOREIGN KEY (tag_description) REFERENCES Tag(tag_description) 
-);
+); 
