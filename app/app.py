@@ -337,32 +337,14 @@ def add_like():
 	photo_id = request.args.get('pid')
 	user_id = getUserIdFromEmail(flask_login.current_user.id)
 
-<<<<<<< HEAD
-	# cursor.execute("SELECT user_id FROM Likes")
-	# res1 = cursor.fetchall()
-	# if (res1 == ())
-
-	cursor.execute("SELECT L.picture_id FROM Likes L JOIN Pictures P WHERE L.picture_id = P.picture_id")
-	res = cursor.fetchall() 
-	if (res == ()):
-=======
 	if likeCheck(photo_id, user_id) == True: 
 		cursor = conn.cursor()
->>>>>>> 3044134234adbf9cd1d386617fecb7b0240d66da
 		cursor.execute("INSERT INTO Likes(like_counter, picture_id, user_id) VALUES ('{0}', '{1}', '{2}')".format(likes, photo_id, user_id))
 		cursor.execute("UPDATE Likes SET like_counter = like_counter + 1")
 		conn.commit()
 		return render_template('browse.html', message = "Like added")
 	else:
-<<<<<<< HEAD
-		cursor.execute("UPDATE Likes SET like_counter=like_counter + 1")
-		conn.commit()
-	photo_list = getPhotos()
-	album_list = getAlbums()
-	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list)
-=======
 		return render_template('browse.html', message = "You have already liked this photo")
->>>>>>> 3044134234adbf9cd1d386617fecb7b0240d66da
 
 @app.route('/show_likes/<pid>', methods=['GET'])
 def show_likes(pid): 
@@ -373,13 +355,8 @@ def show_likes(pid):
 	print(userList)
 	photo_list = getPhotos()
 	album_list = getAlbums()
-<<<<<<< HEAD
-	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list,show_likes = result)
-	
-=======
 	print(album_list)
 	return render_template('likes.html', likes = likes, userList = userList, message = "Here are all the users who have liked this photo", photo = getPhotoById(pid), base64=base64)
->>>>>>> 3044134234adbf9cd1d386617fecb7b0240d66da
 
 # @app.route('tags', methods=["POST"])	
 
@@ -496,7 +473,6 @@ def allTags():
 	print(tag_list)
 	return render_template('browseByTags.html', alltags = tag_list)
 
-<<<<<<< HEAD
 @app.route('/allTagPhoto/<tag>', methods=['GET'])
 @flask_login.login_required
 def allTagsPhoto(tag):
@@ -509,12 +485,6 @@ def getPhotosByTag(tag):
 	return cursor.fetchall()
 
 
-=======
-# @app.route('/searchPhotoByTag', methods=['POST', 'GET'])
-# def searchPhotoByTag():
-#     if flask.request.method == 'POST':
-    	
->>>>>>> 3044134234adbf9cd1d386617fecb7b0240d66da
 
 def getUserPhotoByTag(tag,id):
 	cursor = conn.cursor()
