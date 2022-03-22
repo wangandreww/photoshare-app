@@ -186,9 +186,10 @@ def getUserAlbums(uid):
 	cursor.execute("SELECT album_name,album_id FROM Album WHERE user_id ='{0}'".format(uid))
 	return cursor.fetchall() 
 
-@app.route('deletePhoto')
-@flask_login.login_required
-def deletePhoto():
+# @app.route('deletePhoto')
+# @flask_login.login_required
+# def deletePhoto():
+
     
 
 
@@ -286,6 +287,15 @@ def add_friend():
 		# data = cursor.fetchall()
 		# print(data)
 		return render_template('friends.html')
+
+@app.route('/listFriends', methods = ['GET'])
+@flask_login.login_required
+def listFriends():
+	curr_id = getUserIdFromEmail(flask_login.current_user.id)
+	cursor = conn.cursor()
+	cursor.execute("SELECT first_name, last_name, email FROM Users AS U WHERE U.user_id IN (SELECT DISTINCT user_id2 FROM Friends as F2 WHERE F2.user_id1 = '{0}')".format(curr_id))
+	friendsList = cursor.fetchall()
+	return render_template('listFriends.html',friends = friendsList)
 
 @app.route('/viewcomments/<photo_id>', methods = ['GET'])
 def viewComments(photo_id):

@@ -1,0 +1,15 @@
+<h1>Friends List</h1>
+{% if friends %}
+<h2>Here are your Friends!</h2>
+    <ul>
+    {% for friend in friends %}
+        <li>{{friend}}</a> </br> </li>
+    {% endfor %}
+    </ul>
+    <br>
+{% endif %}
+
+
+<button>
+    <a href="/"> Home </a>
+</button>

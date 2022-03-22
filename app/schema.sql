@@ -58,14 +58,14 @@ CREATE TABLE Comments(
   user_id VARCHAR(255),
   picture_id int4,
   CONSTRAINT comment_pk PRIMARY KEY (comment_id),
-  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id) 
+  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Likes(
   like_counter int4,
   picture_id int4,
   user_id int4,
-  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id),
+  FOREIGN KEY (picture_id) REFERENCES Pictures(picture_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 ) 
 
