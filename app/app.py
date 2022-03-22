@@ -184,7 +184,12 @@ def protected():
 def getUserAlbums(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT album_name,album_id FROM Album WHERE user_id ='{0}'".format(uid))
-	return cursor.fetchall()
+	return cursor.fetchall() 
+
+@app.route('deletePhoto')
+@flask_login.login_required
+def deletePhoto():
+    
 
 
 #begin photo uploading code
@@ -306,10 +311,22 @@ def searchComments():
 		return render_template('searchComments.html', userList = userList)
 	else:
 		return render_template('searchComments.html')
+	
+def getUserIdFromPhoto(pid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT user_id FROM Pictures where picture_id = '{0}'".format(pid))
+	result = cursor.fetchone() 
+	print(result)
+	return result
 
 @app.route('/comments', methods=['POST'])  
 def add_comment():
-	if request.method == 'POST': 
+	pid = request.args.get('pid')
+	uid = getUserIdFromEmail(flask_login.current_user.id)
+	photo_list = getPhotos()
+	album_list = getAlbums()
+
+	if getUserIdFromPhoto(pid) == uid:
 		comment = request.form.get('comment') 
 		print(comment)
 		uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -318,8 +335,9 @@ def add_comment():
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO Comments(comment_description, comment_timestamp, user_id, picture_id) VALUES ('{0}', '{1}', '{2}', '{3}')".format(comment, current_date, uid, photo_id))
 		conn.commit()
-
-		return render_template('hello.html')
+		return render_template('browse.html',message = "Comment Added!",photos=photo_list,base64=base64,albums = album_list)
+	else:
+		return render_template('browse.html', message="You cannot comment on your own photo", photos=photo_list, base64=base64,albums=album_list)
 
 def likeCheck(user_id, photo_id):
 	cursor = conn.cursor()
@@ -419,7 +437,6 @@ def searchFriends():
 def browse():
 	photo_list = getPhotos()
 	album_list = getAlbums()
-	print(album_list)
 	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list)
 
 @app.route('/browse/<album_id>', methods=['GET'])
