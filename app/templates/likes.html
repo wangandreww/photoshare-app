@@ -1,0 +1,25 @@
+<button>
+    <a href="/"> Home </a>
+</button>
+
+<h1> {{message}} </h1>
+
+<ul> 
+    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0][0]).decode("ascii") }}'/>
+</ul>
+
+Like counter: {{likes}} <br/>
+
+{% if userList %}
+
+    <ul>
+        {% for user in userList %}
+
+        <li>
+            <p>
+                Liked by: {{user[1]}} {{user[2]}} <br>              
+            </p>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
