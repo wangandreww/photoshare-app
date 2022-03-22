@@ -12,10 +12,10 @@
 
 
 {% if alltags %}
-<h2>Browse your photos by Tags</h2>
+<h2>Browse all photos by Tags</h2>
     <ul>
     {% for tag in alltags %}
-        <li><a href="/userTagPhoto/{{tag[0]}}">{{tag[0]}}</a> </br> </li>
+        <li><a href="/allTagPhoto/{{tag[0]}}">{{tag[0]}}</a> </br> </li>
     {% endfor %}
     </ul>
     <a href='/browseByTags'>See Your Tags!</a>

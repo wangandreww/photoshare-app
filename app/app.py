@@ -333,9 +333,6 @@ def add_like():
 	# cursor.execute("SELECT user_id FROM Likes")
 	# res1 = cursor.fetchall()
 	# if (res1 == ())
-    		
-
-
 
 	cursor.execute("SELECT L.picture_id FROM Likes L JOIN Pictures P WHERE L.picture_id = P.picture_id")
 	res = cursor.fetchall() 
@@ -346,8 +343,9 @@ def add_like():
 	else:
 		cursor.execute("UPDATE Likes SET like_counter=like_counter + 1")
 		conn.commit()
-	
-	return render_template('browse.html')
+	photo_list = getPhotos()
+	album_list = getAlbums()
+	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list)
 
 @app.route('/show_likes/<pid>', methods=['GET'])
 def show_likes(pid): 
@@ -358,7 +356,6 @@ def show_likes(pid):
 	print(result)
 	photo_list = getPhotos()
 	album_list = getAlbums()
-	print(album_list)
 	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list,show_likes = result)
 	
 
@@ -477,6 +474,18 @@ def allTags():
 	tag_list = getAllTags()
 	print(tag_list)
 	return render_template('browseByTags.html', alltags = tag_list)
+
+@app.route('/allTagPhoto/<tag>', methods=['GET'])
+@flask_login.login_required
+def allTagsPhoto(tag):
+	photo_list = getPhotosByTag(tag)
+	return render_template('allTagPhoto.html',photos = photo_list,base64=base64,tag_name= tag)
+
+def getPhotosByTag(tag):
+	cursor = conn.cursor()
+	cursor.execute("SELECT p.imgdata, p.picture_id, p.caption FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND c.tag_description = '{0}'".format(tag))
+	return cursor.fetchall()
+
 
 
 def getUserPhotoByTag(tag,id):
