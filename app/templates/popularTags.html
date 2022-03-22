@@ -1,0 +1,10 @@
+{% if alltags %}
+<h2>Most Popular Tags</h2>
+    <ul>
+    {% for tag in alltags %}
+        <li><a href="/popularTags/{{tag[0]}}">{{tag[0]}}</a> </br> </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<a href='/'>Home</a>

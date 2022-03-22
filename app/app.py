@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Huyphan007!'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -495,6 +495,21 @@ def allTags():
 def allTagsPhoto(tag):
 	photo_list = getPhotosByTag(tag)
 	return render_template('allTagPhoto.html',photos = photo_list,base64=base64,tag_name= tag)
+
+@app.route('/popularTags', methods=['GET'])
+def popularTags():
+	cursor = conn.cursor()
+	cursor.execute("SELECT T.tag_description FROM CreatePictureTag AS T, Pictures AS P WHERE T.picture_id = P.picture_id GROUP BY T.tag_description order by count(P.picture_id) desc limit 3")
+	result = cursor.fetchall()
+	return render_template('popularTags.html', alltags = result)
+
+
+
+
+def allTags():
+	tag_list = getAllTags()
+	print(tag_list)
+	return render_template('browseByTags.html', alltags = tag_list)
 
 def getPhotosByTag(tag):
 	cursor = conn.cursor()
