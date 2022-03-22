@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Huyphan007!'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -242,12 +242,12 @@ def getPhotoId(caption, data, albums_id):
 	return cursor.fetchone()[0]
 
 def getAlbumID(albumname,uid):
+	print(albumname)
 	cursor = conn.cursor()
 	cursor.execute("SELECT album_id FROM Album WHERE album_name = '{0}' AND user_id = '{1}'".format(albumname, uid))
 	result = cursor.fetchone()[0]
-	return result
-
-
+	print(result)
+	return result 
 
 @app.route('/friends', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -309,7 +309,6 @@ def searchComments():
 
 @app.route('/comments', methods=['POST'])  
 def add_comment():
-    	
 	if request.method == 'POST': 
 		comment = request.form.get('comment') 
 		print(comment)
@@ -322,45 +321,42 @@ def add_comment():
 
 		return render_template('hello.html')
 
+def likeCheck(user_id, photo_id):
+	cursor = conn.cursor()
+	cursor.execute("SELECT picture_id, user_id FROM Likes WHERE picture_id = '{0}' AND user_id = '{1}'".format(photo_id, user_id))
+	res = cursor.fetchall()
+	if res == ():
+		return True 
+	else:
+		return False 
+
 @app.route('/add_like', methods=['POST'])
 @flask_login.login_required
 def add_like(): 
 	likes = 0
 	photo_id = request.args.get('pid')
 	user_id = getUserIdFromEmail(flask_login.current_user.id)
-	cursor = conn.cursor()
 
-	# cursor.execute("SELECT user_id FROM Likes")
-	# res1 = cursor.fetchall()
-	# if (res1 == ())
-    		
-
-
-
-	cursor.execute("SELECT L.picture_id FROM Likes L JOIN Pictures P WHERE L.picture_id = P.picture_id")
-	res = cursor.fetchall() 
-	if (res == ()):
+	if likeCheck(photo_id, user_id) == True: 
+		cursor = conn.cursor()
 		cursor.execute("INSERT INTO Likes(like_counter, picture_id, user_id) VALUES ('{0}', '{1}', '{2}')".format(likes, photo_id, user_id))
 		cursor.execute("UPDATE Likes SET like_counter = like_counter + 1")
 		conn.commit()
+		return render_template('browse.html', message = "Like added")
 	else:
-		cursor.execute("UPDATE Likes SET like_counter=like_counter + 1")
-		conn.commit()
-	
-	return render_template('browse.html')
+		return render_template('browse.html', message = "You have already liked this photo")
 
 @app.route('/show_likes/<pid>', methods=['GET'])
 def show_likes(pid): 
 	cursor = conn.cursor()
-	cursor.execute("SELECT COUNT(DISTINCT user_id) FROM Likes WHERE picture_id = '{0}'".format(pid))
-	result = cursor.fetchone()[0]
-	
-	print(result)
+	cursor.execute("SELECT COUNT(DISTINCT L.user_id), U.first_name, U.last_name FROM Likes L JOIN Users U  WHERE L.picture_id = '{0}' AND L.user_id = U.user_id GROUP BY L.user_id".format(pid))
+	userList = cursor.fetchall()
+	likes = len(userList)
+	print(userList)
 	photo_list = getPhotos()
 	album_list = getAlbums()
 	print(album_list)
-	return render_template('browse.html',message = "Here are all photos!",photos=photo_list,base64=base64,albums = album_list,show_likes = result)
-	
+	return render_template('likes.html', likes = likes, userList = userList, message = "Here are all the users who have liked this photo", photo = getPhotoById(pid), base64=base64)
 
 # @app.route('tags', methods=["POST"])	
 
@@ -464,7 +460,6 @@ def userTagList():
 	print(tag_list)
 	return render_template('browseByTags.html',tags = tag_list)
 
-
 @app.route('/userTagPhoto/<tag>', methods=['GET'])
 def userTagPhoto(tag):
 	curr_id = getUserIdFromEmail(flask_login.current_user.id)
@@ -478,6 +473,10 @@ def allTags():
 	print(tag_list)
 	return render_template('browseByTags.html', alltags = tag_list)
 
+# @app.route('/searchPhotoByTag', methods=['POST', 'GET'])
+# def searchPhotoByTag():
+#     if flask.request.method == 'POST':
+    	
 
 def getUserPhotoByTag(tag,id):
 	cursor = conn.cursor()
