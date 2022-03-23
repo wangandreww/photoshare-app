@@ -1,0 +1,42 @@
+<button>
+    <a href="/"> Home </a>
+</button>
+
+{% if message %}
+    <h2>{{message}}</h2>
+{% endif %}
+
+{% if photos %} 
+    <ul>
+    {% for photo in photos %}
+
+        <li>{{photo[2]}}<br> 
+        <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
+        <li><a href='/viewcomments/{{photo[1]}}'>View All of This Photo's Comments</a></li>
+
+        <form action="{{url_for('add_comment', pid=photo[1])}}" method="post">
+            <h1> Leave a comment! </h1>
+                <label for="comment">Enter Comment:</label>
+                <input type="text" name= "comment" /><br />
+                <input type="submit" />
+        </form> 
+        
+        <form action="{{url_for('add_like', pid=photo[1])}}" method="post" >
+            <label for="like"></label> 
+            <input type="submit" value="like" name="like"/> <br/>
+        </form>
+
+        <a href="/show_likes/{{photo[1]}}"> 
+            <Button>
+                Show Likes
+            </Button>
+        </a>
+
+        {% if show_likes %}
+            {{show_likes}}
+        {% endif %}
+
+    {% endfor %}
+    </ul>
+{% endif %}
+

@@ -1,0 +1,41 @@
+<head>
+    <title>Search Photos by Tags</title>
+  </head>
+  
+  <body>
+    {% if message %}
+      <h4>{{message}}</h4>
+    {% endif %}
+  
+    {% if result %}
+          <h2>Here are photos tagged with your search!</h2>
+      <u1>
+          {% for photo in result %}
+          <li>{{photo[2]}}<br>
+              <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
+             <form method = "post" action = "{{url_for('add_like', pid =photo[1])}}">
+           <input type = "submit" name = "Like" value = "Like">
+           </form>
+               <a href = '/viewlikes/{{photo[1]}}'> View Likes </a>
+              
+              <form action="{{url_for('add_comment', pid=photo[1])}}" method="post">
+              <h1> Leave a comment! </h1>
+                  <label for="comment">Enter Comment:</label>
+                  <input type="text" name= "comment" /><br />
+                  <input type="submit" />
+              </form>
+             
+          <a href='/viewComments'>View Comments</a>
+          {% endfor %}
+      </u1>
+      
+    {% endif %}
+  
+    <form action="{{url_for('searchBy')}}" method="post">
+    <h1> Search for photos by tags! </h1>
+      <label for="tags">Enter tags you want separated by space:</label>
+      <input type="search" name= "tags" /><br />
+      <input type="submit" />
+    </form>
+  
+    <li><a href='/'>Home</a></li>
