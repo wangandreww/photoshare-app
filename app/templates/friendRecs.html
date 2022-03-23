@@ -1,0 +1,14 @@
+<head>
+    <title>Friend Recommendations</title>
+  </head>
+  
+  <body>
+    {% if mutual_list %}
+    {%for user in mutual_list%}
+      <h4>{{user[0]}} Has {{user[1]}} mutual friends with you</h4>
+      {%endfor%}
+    {% endif %}
+  
+  
+  
+    <li><a href='/'>Home</a></li>

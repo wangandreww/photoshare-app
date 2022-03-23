@@ -1,13 +1,15 @@
 <h1>Here is Your Profile!</h1>
+
 {% if photos %}
     <ul>
     {% for photo in photos %}
 
         <li>{{photo[2]}}<br>
         <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/></li>
-        <a href="/deletePicture">Delete this Picture</a>
-        
-        
+
+        <form method = "post" action = "{{url_for('deletePhoto', pid =photo[1])}}">
+            <input type = "submit" name = "DeletePhoto" value = "Delete Photo">
+        </form>
     {% endfor %}
     </ul>
 {% endif %}
@@ -19,7 +21,10 @@
     {% for album in albums %}
 
         <li><a href='/browse/{{album[1]}}'>{{album[0]}}</a></li>
-        <a href="/deleteAlbum">Delete this Picture</a>
+
+        <form method = "post" action = "{{url_for('deleteAlbum', aid = album[1])}}">
+            <input type = "submit" name = "DeleteAlbum" value = "Delete Album">
+        </form>
         
     {% endfor %}
     </ul>
