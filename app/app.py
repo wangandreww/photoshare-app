@@ -208,6 +208,11 @@ def deleteAlbum():
 def myFunc(tuple):
     return tuple[1]
 
+def getEmailFromId(user_id):
+	cursor = conn.cursor()
+	cursor.execute("SELECT email FROM Users WHERE user_id = '{0}'".format(user_id))
+	return cursor.fetchone()[0]
+
 @app.route('/friendRecs', methods = ['GET'])
 def friendRecs():
 	cursor = conn.cursor()
@@ -220,6 +225,7 @@ def friendRecs():
 		friendlist = cursor.fetchall()
 		masterList.append(friendlist)
 	mydict = {}
+	print(masterList)
 	for i in range(len(masterList)):
 		for j in range(len(masterList[i])):
 			name = masterList[i][j][0]
@@ -227,6 +233,7 @@ def friendRecs():
 				mydict.update({name:(mydict.get(masterList[i][j][0]) + 1)})
 			else:
 				mydict[name] = 1
+	print(mydict)
 	mutual = []
 	for key in mydict:
 		if mydict.get(key) >= 2:
@@ -242,8 +249,6 @@ def friendRecs():
 
 def userScores():
 	''' score = comments + posts '''
-
-	''' find comments '''
 	cursor = conn.cursor()
 	cursor.execute("SELECT user_id, COUNT(user_id) FROM Comments GROUP BY user_id")
 	commentScores = cursor.fetchall()
@@ -255,44 +260,43 @@ def userScores():
 	cursor.execute("SELECT user_id, COUNT(user_id) FROM Pictures GROUP BY user_id")
 	photoScores = cursor.fetchall()
 
-	finalScores = {}
+	print(commentScores)
+	print(photoScores)
+
+	finalscore = {}
 
 	for i in photoScores:
-		if getEmailFromId(i[0]) not in finalScores:
+		if getEmailFromId(i[0]) not in finalscore:
 			finalscore[getEmailFromId(i[0])] = i[1]
 		else:
 			finalscore[getEmailFromId(i[0])] += i[1]
 	for i in commentScores:
 		if i[0] == None:
 			continue
-		elif getEmailFromId(i[0]) not in finalScores:
+		elif getEmailFromId(i[0]) not in finalscore:
 			finalscore[getEmailFromId(i[0])] = i[1]
 		else:
 			finalscore[getEmailFromId(i[0])] += i[1]
 
 	return finalscore
 
-
 @app.route('/ranks', methods=['GET'])
 def ranks():
 	scoreDict = userScores()
-	tempUsers = sorted(mydict, key=mydict.get, reverse=True)
+	print(scoreDict)
+	tempUsers = sorted(scoreDict, key=scoreDict.get, reverse=True)
 	userList = []
 
 	for i in tempUsers:
-		userList.append((i, mydict[i]))
+		userList.append((i, scoreDict[i]))
 	
 	if(len(userList) <= 10):
-    		return render_template('getRanks.html', message= 'Here are the rankings', ranked = userlist)
+    		return render_template('getRanks.html', message= 'Here are the rankings', ranked = userList)
 	else:
 		newranks = []
 		for x in range(10):
 			newranks.append(userlist[x])
 		return render_template('getRanks.html', message = 'Here are the rankings', ranked = newranks)
-
-# @app.route('/photoRecs', methods=['GET'])
-# def photoRec():
-    
 
 #begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML
@@ -613,9 +617,6 @@ def popularTags():
 	result = cursor.fetchall()
 	return render_template('popularTags.html', alltags = result)
 
-
-
-
 def allTags():
 	tag_list = getAllTags()
 	print(tag_list)
@@ -625,8 +626,6 @@ def getPhotosByTag(tag):
 	cursor = conn.cursor()
 	cursor.execute("SELECT p.imgdata, p.picture_id, p.caption FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND c.tag_description = '{0}'".format(tag))
 	return cursor.fetchall()
-
-
 
 def getUserPhotoByTag(tag,id):
 	cursor = conn.cursor()
@@ -657,9 +656,6 @@ if __name__ == "__main__":
 	#this is invoked when in the shell  you run
 	#$ python app.py
 	app.run(port=5000, debug=True)
-
-
-
 #THINGS SKIPPED FOR NOW 
 
 #user activity
