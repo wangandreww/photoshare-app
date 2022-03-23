@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'PiguPigu149'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Huyphan007!'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -186,11 +186,113 @@ def getUserAlbums(uid):
 	cursor.execute("SELECT album_name,album_id FROM Album WHERE user_id ='{0}'".format(uid))
 	return cursor.fetchall() 
 
-@app.route('deletePhoto')
+@app.route('/deletePhoto', methods=['POST'])
 @flask_login.login_required
 def deletePhoto():
-    
+	pid = request.args.get('pid')
+	cursor = conn.cursor()
+	cursor.execute("DELETE FROM Pictures WHERE picture_id = '{0}'".format(pid))
+	conn.commit()
+	return render_template('hello.html', message="Photo deleted")
 
+@app.route('/deleteAlbum', methods=['POST'])
+@flask_login.login_required
+def deleteAlbum():
+	uid = getUserIdFromEmail(flask_login.current_user.id)
+	aid = request.args.get('aid')
+	cursor = conn.cursor()
+	cursor.execute("DELETE FROM Album WHERE album_id = '{0}'".format(aid))
+	conn.commit()
+	return render_template('hello.html', message="Album deleted")
+
+def myFunc(tuple):
+    return tuple[1]
+
+@app.route('/friendRecs', methods = ['GET'])
+def friendRecs():
+	cursor = conn.cursor()
+	cursor.execute("SELECT user_id2 FROM Friends WHERE user_id1 = '{0}'".format(getUserIdFromEmail(flask_login.current_user.id)))
+	current_friendlist = cursor.fetchall()
+	masterList = []
+	for x in current_friendlist:
+		cursor = conn.cursor()
+		cursor.execute("SELECT user_id2 FROM Friends WHERE user_id1 = '{0}'".format(x[0])) #gets each of your friend's friendlist
+		friendlist = cursor.fetchall()
+		masterList.append(friendlist)
+	mydict = {}
+	for i in range(len(masterList)):
+		for j in range(len(masterList[i])):
+			name = masterList[i][j][0]
+			if name in mydict:
+				mydict.update({name:(mydict.get(masterList[i][j][0]) + 1)})
+			else:
+				mydict[name] = 1
+	mutual = []
+	for key in mydict:
+		if mydict.get(key) >= 2:
+			mutual.append([key,mydict.get(key)])
+	mutual.sort(key=myFunc)
+	mutual.reverse()
+	for x in mutual:
+		if((x[0],) in current_friendlist):
+			mutual.remove(x)
+	for x in mutual:
+		x[0] = getEmailFromId(x[0])
+	return render_template('friendRecs.html', mutual_list = mutual, message = 'Here are your friend recommendations')
+
+def userScores():
+	''' score = comments + posts '''
+
+	''' find comments '''
+	cursor = conn.cursor()
+	cursor.execute("SELECT user_id, COUNT(user_id) FROM Comments GROUP BY user_id")
+	commentScores = cursor.fetchall()
+	scores = []
+
+	for i in commentScores:
+		scores.append((i[0], i[1]))
+
+	cursor.execute("SELECT user_id, COUNT(user_id) FROM Pictures GROUP BY user_id")
+	photoScores = cursor.fetchall()
+
+	finalScores = {}
+
+	for i in photoScores:
+		if getEmailFromId(i[0]) not in finalScores:
+			finalscore[getEmailFromId(i[0])] = i[1]
+		else:
+			finalscore[getEmailFromId(i[0])] += i[1]
+	for i in commentScores:
+		if i[0] == None:
+			continue
+		elif getEmailFromId(i[0]) not in finalScores:
+			finalscore[getEmailFromId(i[0])] = i[1]
+		else:
+			finalscore[getEmailFromId(i[0])] += i[1]
+
+	return finalscore
+
+
+@app.route('/ranks', methods=['GET'])
+def ranks():
+	scoreDict = userScores()
+	tempUsers = sorted(mydict, key=mydict.get, reverse=True)
+	userList = []
+
+	for i in tempUsers:
+		userList.append((i, mydict[i]))
+	
+	if(len(userList) <= 10):
+    		return render_template('getRanks.html', message= 'Here are the rankings', ranked = userlist)
+	else:
+		newranks = []
+		for x in range(10):
+			newranks.append(userlist[x])
+		return render_template('getRanks.html', message = 'Here are the rankings', ranked = newranks)
+
+# @app.route('/photoRecs', methods=['GET'])
+# def photoRec():
+    
 
 #begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML
@@ -251,7 +353,6 @@ def getAlbumID(albumname,uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT album_id FROM Album WHERE album_name = '{0}' AND user_id = '{1}'".format(albumname, uid))
 	result = cursor.fetchone()[0]
-	print(result)
 	return result 
 
 @app.route('/friends', methods=['GET', 'POST'])
@@ -326,7 +427,7 @@ def add_comment():
 	photo_list = getPhotos()
 	album_list = getAlbums()
 
-	if getUserIdFromPhoto(pid) == uid:
+	if getUserIdFromPhoto(pid) != uid:
 		comment = request.form.get('comment') 
 		print(comment)
 		uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -542,8 +643,6 @@ def hello():
 	# 	print(1)
 	
 	return render_template('hello.html', message='Welecome to Photoshare')
-
-
 
 if __name__ == "__main__":
 	#this is invoked when in the shell  you run

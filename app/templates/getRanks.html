@@ -1,0 +1,15 @@
+<title>Top 10 Users</title>
+</head>
+{%if message%}
+<h3>{{message}}</h3>
+{%endif%}
+<body>
+  {% if ranked %}
+  {%for user in ranked%}
+    <h4>{{user[0]}} Has {{user[1]}} Total Points</h4>
+    {%endfor%}
+  {% endif %}
+
+
+
+  <li><a href='/'>Home</a></li>
