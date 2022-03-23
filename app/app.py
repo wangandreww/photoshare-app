@@ -613,9 +613,16 @@ def allTagsPhoto(tag):
 @app.route('/popularTags', methods=['GET'])
 def popularTags():
 	cursor = conn.cursor()
-	cursor.execute("SELECT T.tag_description FROM CreatePictureTag AS T, Pictures AS P WHERE T.picture_id = P.picture_id GROUP BY T.tag_description order by count(P.picture_id) desc limit 3")
+	cursor.execute("SELECT T.tag_description FROM CreatePictureTag AS T, Pictures AS P WHERE T.picture_id = P.picture_id GROUP BY T.tag_description order by count(P.picture_id) desc limit 5")
 	result = cursor.fetchall()
 	return render_template('popularTags.html', alltags = result)
+
+
+def getPopularTags():
+	cursor = conn.cursor()
+	cursor.execute("SELECT T.tag_description FROM CreatePictureTag AS T, Pictures AS P WHERE T.picture_id = P.picture_id GROUP BY T.tag_description order by count(P.picture_id) desc limit 5")
+	return cursor.fetchall()
+
 
 def allTags():
 	tag_list = getAllTags()
@@ -642,7 +649,89 @@ def getUserTags(id):
 	cursor.execute("SELECT DISTINCT c.tag_description FROM CreatePictureTag c, Pictures p WHERE c.picture_id = p.picture_id AND p.user_id= '{0}'".format(id))
 	return cursor.fetchall()
 
+@app.route('/photoRec', methods = ['GET'])
+def photoRec():
+	tags = getPopularTags()
+	print(tags)
+	tag_list = []
+	# photo_list = getPhotos()
+	mydict = {}
+	for x in tags:
+		tag_list.append(x[0])
+	for y in tag_list:
+		
+		recList = getPhotosByTag(y)
+		for photo in recList:
+			if(photo[1] in mydict):
+				mydict.update({photo[1]: (mydict[photo[1]] + 1)})
+			else:
+				mydict[photo[1]] = 1
+	reclistfinal = sorted(mydict, key=mydict.get, reverse=True)
+	listphoto = ()
+	for x in reclistfinal:
+		cursor = conn.cursor()
+		cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE picture_id = '{0}'".format(x))
+		listphoto+=(cursor.fetchall())
+	return render_template('photoRec.html', message = 'You may also like these photos', photos = listphoto, base64=base64)
 
+
+
+@app.route('/searchTags', methods = ['GET','POST'])
+
+def searchBy():
+	if flask.request.method == 'GET':
+		return render_template('searchTags.html')
+	else:
+
+		try:
+
+			tags = request.form.get('tags')
+			tag_list = tags.split(' ')
+
+		except:
+
+			print("couldn't find all tokens") #this prints to shell, end users will not see this (all print statements go to shell)
+			return flask.redirect(flask.url_for('searchTags'))
+		resultList = []
+		photo_id_by_tags = []
+		for x in tag_list:
+			try:
+				tuplephotolist = getPhotosByTag(x)
+				print('SUCESS')
+			except:
+				return render_template('searchTags.html', message='The Tag does not Exist')
+			photo_id_per_tag = []
+			for i in range(len(tuplephotolist)):
+				photo_id_per_tag.append(tuplephotolist[i][1])
+			photo_id_by_tags.append(photo_id_per_tag)
+		
+		first_tag_photos = photo_id_by_tags[0]
+		rest_tag_photos = photo_id_by_tags[1:len(photo_id_by_tags)]
+		for i in first_tag_photos:
+			valid = True
+			for j in rest_tag_photos:
+				if(photoExistInList(i,j)):
+					continue
+				else:
+					valid = False
+					break
+			if(valid == True):
+				resultList.append(i)
+			else:
+				continue
+		photoList = []
+		for x in resultList:
+			cursor = conn.cursor()
+			cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE picture_id = '{0}'".format(x))
+			temp = cursor.fetchall()
+			photoList.append(temp[0])
+		return render_template('searchTags.html', message = 'Search Result', result = photoList, base64=base64)
+
+def photoExistInList(photo_id, listOfPhotos):
+	if(photo_id in listOfPhotos):
+		return True
+	else:
+		return False
 
 #default page
 @app.route("/", methods=['GET'])
